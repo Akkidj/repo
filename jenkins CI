@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('git clone') {
+            steps {
+                sh'rm -rf *'
+                git 'https://github.com/Pritam-Khergade/onlinebookstore.git'
+            }
+        }
+        
+         stage('intall maven') {
+            steps {
+                sh'sudo yum install maven -y '
+            }
+        }
+        
+         stage('build artifatct') {
+            steps {
+                sh'mvn clean package '
+            }
+        }
+        
+         stage('create bucket ') {
+            steps {
+                sh'aws s3api create-bucket --bucket bhopali-buc --region us-east-1'
+            }
+        }
+        
+        stage('move in s3 ') {
+            steps {
+                sh'aws s3 cp ./target/onlinebookstore.war s3://bhopali-buc/onlinebookstore{$BUILD_NUMBER}.war'
+            }
+        }
+        
+        
+        
+        
+        
+        
+    }
+    
+}
